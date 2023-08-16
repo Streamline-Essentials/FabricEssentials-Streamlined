@@ -11,6 +11,29 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
+ext {
+    String version = "45ec19a841"
+
+    File folder = new File("libs");
+    folder.mkdirs();
+    apiFile = new File(folder, "StreamlineCore-API-" + version + ".jar")
+
+    URL url = new URL("https://jitpack.io/com/github/Streamline-Essentials/StreamlineCore/StreamlineCore-API/" + version + "/StreamlineCore-API-" + version + ".jar")
+    BufferedInputStream bis = new BufferedInputStream(url.openStream())
+    FileOutputStream fis = new FileOutputStream(apiFile);
+
+    byte[] buffer = new byte[1024];
+    int count=0;
+
+    while((count = bis.read(buffer,0,1024)) != -1)
+    {
+        fis.write(buffer, 0, count);
+    }
+
+    fis.close();
+    bis.close();
+}
+
 repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://maven.nucleoid.xyz/" }
@@ -42,6 +65,8 @@ dependencies {
     // Hocon config
     implementation shadow("org.spongepowered:configurate-hocon:${project.configurate_hocon_version}")
 
+    modImplementation include(files(apiFile.getPath()))
+    annotationProcessor(files(apiFile.getPath()))
 }
 
 shadowJar {
